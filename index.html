@@ -1,885 +1,2499 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Quiz CLI Cisco - Tous les TPs</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-            overflow: hidden;
-        }
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        overflow: hidden;
+      }
 
-        .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 40px;
-            text-align: center;
-        }
+      .header {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: white;
+        padding: 40px;
+        text-align: center;
+      }
 
-        .header h1 {
-            font-size: 2.8em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
+      .header h1 {
+        font-size: 2.8em;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
 
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.95;
-        }
+      .header p {
+        font-size: 1.2em;
+        opacity: 0.95;
+      }
 
-        .difficulty-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: bold;
-            margin-top: 10px;
-        }
+      .difficulty-badge {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        font-weight: bold;
+        margin-top: 10px;
+      }
 
-        .difficulty-easy { background: #28a745; }
-        .difficulty-medium { background: #ffc107; color: #000; }
-        .difficulty-hard { background: #dc3545; }
+      .difficulty-easy {
+        background: #28a745;
+      }
+      .difficulty-medium {
+        background: #ffc107;
+        color: #000;
+      }
+      .difficulty-hard {
+        background: #dc3545;
+      }
 
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            padding: 25px;
-            background: #f8f9fa;
-            border-bottom: 3px solid #e9ecef;
-            gap: 20px;
-        }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        padding: 25px;
+        background: #f8f9fa;
+        border-bottom: 3px solid #e9ecef;
+        gap: 20px;
+      }
 
-        .stat-item {
-            text-align: center;
-            padding: 10px;
-        }
+      .stat-item {
+        text-align: center;
+        padding: 10px;
+      }
 
-        .stat-number {
-            font-size: 2.2em;
-            font-weight: bold;
-            color: #1e3c72;
-        }
+      .stat-number {
+        font-size: 2.2em;
+        font-weight: bold;
+        color: #1e3c72;
+      }
 
-        .stat-label {
-            color: #6c757d;
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
+      .stat-label {
+        color: #6c757d;
+        font-size: 0.9em;
+        margin-top: 5px;
+      }
 
-        .content {
-            padding: 40px;
-        }
+      .content {
+        padding: 40px;
+      }
 
-        .quiz-selector {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
+      .quiz-selector {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+      }
 
-        .quiz-card {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
+      .quiz-card {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
 
-        .quiz-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            transform: rotate(45deg);
-            transition: all 0.5s;
-        }
+      .quiz-card::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.1) 0%,
+          transparent 70%
+        );
+        transform: rotate(45deg);
+        transition: all 0.5s;
+      }
 
-        .quiz-card:hover::before {
-            top: -30%;
-            right: -30%;
-        }
+      .quiz-card:hover::before {
+        top: -30%;
+        right: -30%;
+      }
 
-        .quiz-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 15px 40px rgba(30, 60, 114, 0.5);
-        }
+      .quiz-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 15px 40px rgba(30, 60, 114, 0.5);
+      }
 
-        .quiz-card h3 {
-            font-size: 1.6em;
-            margin-bottom: 12px;
-            position: relative;
-            z-index: 1;
-        }
+      .quiz-card h3 {
+        font-size: 1.6em;
+        margin-bottom: 12px;
+        position: relative;
+        z-index: 1;
+      }
 
-        .quiz-card p {
-            opacity: 0.95;
-            font-size: 0.95em;
-            line-height: 1.5;
-            position: relative;
-            z-index: 1;
-        }
+      .quiz-card p {
+        opacity: 0.95;
+        font-size: 0.95em;
+        line-height: 1.5;
+        position: relative;
+        z-index: 1;
+      }
 
-        .question-container {
-            display: none;
-            animation: slideIn 0.5s;
-        }
+      .question-container {
+        display: none;
+        animation: slideIn 0.5s;
+      }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-30px); }
-            to { opacity: 1; transform: translateX(0); }
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(-30px);
         }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
 
-        .question-header {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 20px 25px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
+      .question-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 20px 25px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
 
-        .question-number {
-            font-weight: bold;
-            color: #1e3c72;
-            font-size: 1.3em;
-        }
+      .question-number {
+        font-weight: bold;
+        color: #1e3c72;
+        font-size: 1.3em;
+      }
 
-        .question-text {
-            background: white;
-            padding: 30px;
-            border-left: 6px solid #1e3c72;
-            margin-bottom: 25px;
-            font-size: 1.15em;
-            line-height: 1.8;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-            border-radius: 8px;
-        }
+      .question-text {
+        background: white;
+        padding: 30px;
+        border-left: 6px solid #1e3c72;
+        margin-bottom: 25px;
+        font-size: 1.15em;
+        line-height: 1.8;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        border-radius: 8px;
+      }
 
-        .question-text code {
-            background: #f8f9fa;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            color: #dc3545;
-            font-weight: bold;
-        }
+      .question-text code {
+        background: #f8f9fa;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+        color: #dc3545;
+        font-weight: bold;
+      }
 
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+      .options {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
 
-        .option {
-            background: #f8f9fa;
-            padding: 20px 22px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 3px solid transparent;
-            display: flex;
-            align-items: center;
-            font-size: 1.05em;
-        }
+      .option {
+        background: #f8f9fa;
+        padding: 20px 22px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: 3px solid transparent;
+        display: flex;
+        align-items: center;
+        font-size: 1.05em;
+      }
 
-        .option:hover {
-            background: #e9ecef;
-            transform: translateX(8px);
-            border-color: #1e3c72;
-        }
+      .option:hover {
+        background: #e9ecef;
+        transform: translateX(8px);
+        border-color: #1e3c72;
+      }
 
-        .option.selected {
-            background: #1e3c72;
-            color: white;
-            border-color: #1e3c72;
-            transform: scale(1.02);
-        }
+      .option.selected {
+        background: #1e3c72;
+        color: white;
+        border-color: #1e3c72;
+        transform: scale(1.02);
+      }
 
-        .option.correct {
-            background: #28a745;
-            color: white;
-            border-color: #28a745;
-        }
+      .option.correct {
+        background: #28a745;
+        color: white;
+        border-color: #28a745;
+      }
 
-        .option.incorrect {
-            background: #dc3545;
-            color: white;
-            border-color: #dc3545;
-        }
+      .option.incorrect {
+        background: #dc3545;
+        color: white;
+        border-color: #dc3545;
+      }
 
-        .option-letter {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: #1e3c72;
-            color: white;
-            margin-right: 18px;
-            font-weight: bold;
-            flex-shrink: 0;
-        }
+      .option-letter {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: #1e3c72;
+        color: white;
+        margin-right: 18px;
+        font-weight: bold;
+        flex-shrink: 0;
+      }
 
-        .option.selected .option-letter {
-            background: white;
-            color: #1e3c72;
-        }
+      .option.selected .option-letter {
+        background: white;
+        color: #1e3c72;
+      }
 
-        .option.correct .option-letter,
-        .option.incorrect .option-letter {
-            background: white;
-        }
+      .option.correct .option-letter,
+      .option.incorrect .option-letter {
+        background: white;
+      }
 
-        .buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 35px;
-        }
+      .buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 35px;
+      }
 
-        .btn {
-            flex: 1;
-            padding: 18px 35px;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.15em;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: bold;
-        }
+      .btn {
+        flex: 1;
+        padding: 18px 35px;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.15em;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: bold;
+      }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-        }
+      .btn-primary {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: white;
+      }
 
-        .btn-primary:hover:not(:disabled) {
-            transform: scale(1.05);
-            box-shadow: 0 8px 25px rgba(30, 60, 114, 0.4);
-        }
+      .btn-primary:hover:not(:disabled) {
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(30, 60, 114, 0.4);
+      }
 
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
+      .btn-secondary {
+        background: #6c757d;
+        color: white;
+      }
 
-        .btn-secondary:hover {
-            background: #5a6268;
-            transform: scale(1.03);
-        }
+      .btn-secondary:hover {
+        background: #5a6268;
+        transform: scale(1.03);
+      }
 
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
 
-        .results {
-            display: none;
-            text-align: center;
-            padding: 50px;
-        }
+      .results {
+        display: none;
+        text-align: center;
+        padding: 50px;
+      }
 
-        .results h2 {
-            font-size: 3em;
-            margin-bottom: 25px;
-            color: #1e3c72;
-        }
+      .results h2 {
+        font-size: 3em;
+        margin-bottom: 25px;
+        color: #1e3c72;
+      }
 
-        .score-circle {
-            width: 220px;
-            height: 220px;
-            border-radius: 50%;
-            margin: 35px auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 3.5em;
-            font-weight: bold;
-            color: white;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-        }
+      .score-circle {
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        margin: 35px auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 3.5em;
+        font-weight: bold;
+        color: white;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+      }
 
-        .score-circle.excellent {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        }
+      .score-circle.excellent {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      }
 
-        .score-circle.good {
-            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-        }
+      .score-circle.good {
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+      }
 
-        .score-circle.needs-improvement {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-        }
+      .score-circle.needs-improvement {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+      }
 
-        .feedback {
-            font-size: 1.3em;
-            color: #6c757d;
-            margin: 25px 0;
-            line-height: 1.6;
-        }
+      .feedback {
+        font-size: 1.3em;
+        color: #6c757d;
+        margin: 25px 0;
+        line-height: 1.6;
+      }
 
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background: #e9ecef;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 25px;
-        }
+      .progress-bar {
+        width: 100%;
+        height: 10px;
+        background: #e9ecef;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 25px;
+      }
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
-            transition: width 0.5s ease;
-        }
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+        transition: width 0.5s ease;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="header">
-            <h1>⚡ Quiz Commandes CLI Cisco</h1>
-            <p>Maîtrisez toutes les commandes des 6 TPs</p>
-            <span class="difficulty-badge difficulty-easy">Facile</span>
-            <span class="difficulty-badge difficulty-medium">Moyen</span>
-            <span class="difficulty-badge difficulty-hard">Difficile</span>
+      <div class="header">
+        <h1>⚡ Quiz Commandes CLI Cisco</h1>
+        <p>Maîtrisez toutes les commandes des 6 TPs</p>
+        <span class="difficulty-badge difficulty-easy">Facile</span>
+        <span class="difficulty-badge difficulty-medium">Moyen</span>
+        <span class="difficulty-badge difficulty-hard">Difficile</span>
+      </div>
+
+      <div class="stats">
+        <div class="stat-item">
+          <div class="stat-number">130+</div>
+          <div class="stat-label">Questions CLI</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">6</div>
+          <div class="stat-label">TPs Couverts</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="userScore">0%</div>
+          <div class="stat-label">Score</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="quizTime">0:00</div>
+          <div class="stat-label">Temps</div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div id="quizSelector" class="quiz-selector">
+          <div class="quiz-card" onclick="startQuiz('tp1')">
+            <h3>🌐 TP1: Réseau de Base</h3>
+            <p>
+              14 questions sur connexion PC, switch basique, DNS/HTTP, ping,
+              ipconfig
+            </p>
+          </div>
+          <div class="quiz-card" onclick="startQuiz('tp2')">
+            <h3>🔧 TP2: Configuration Switch</h3>
+            <p>
+              19 questions sur modes CLI, hostname, IP, passwords, show commands
+            </p>
+          </div>
+          <div class="quiz-card" onclick="startQuiz('tp3')">
+            <h3>🔒 TP3: VLANs & Sécurité</h3>
+            <p>30 questions sur VLANs, trunk, port security, MAC filtering</p>
+          </div>
+          <div class="quiz-card" onclick="startQuiz('tp4')">
+            <h3>📊 TP4: Subnetting & Routage</h3>
+            <p>15 questions sur masques, sous-réseaux, routage de base</p>
+          </div>
+          <div class="quiz-card" onclick="startQuiz('tp5')">
+            <h3>🛣️ TP5: Routage Avancé</h3>
+            <p>32 questions sur routes statiques, RIP, ACLs, NAT/PAT</p>
+          </div>
+          <div class="quiz-card" onclick="startQuiz('vlsm')">
+            <h3>🎯 TP6: VLSM</h3>
+            <p>20 questions sur Variable Length Subnet Masking</p>
+          </div>
+          <div class="quiz-card" onclick="startQuiz('easy')">
+            <h3>🟢 Mode Facile</h3>
+            <p>20 questions basiques - Idéal pour débuter</p>
+          </div>
+          <div class="quiz-card" onclick="startQuiz('medium')">
+            <h3>🟡 Mode Moyen</h3>
+            <p>20 questions intermédiaires - Testez vos connaissances</p>
+          </div>
+          <div class="quiz-card" onclick="startQuiz('hard')">
+            <h3>🔴 Mode Difficile</h3>
+            <p>20 questions avancées - Pour les experts</p>
+          </div>
+          <div class="quiz-card" onclick="startQuiz('all')">
+            <h3>⚡ Quiz Complet</h3>
+            <p>Toutes les 130 questions - Simulation examen réel</p>
+          </div>
         </div>
 
-        <div class="stats">
-            <div class="stat-item">
-                <div class="stat-number">200+</div>
-                <div class="stat-label">Questions CLI</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">6</div>
-                <div class="stat-label">TPs Couverts</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="userScore">0%</div>
-                <div class="stat-label">Score</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="quizTime">0:00</div>
-                <div class="stat-label">Temps</div>
-            </div>
+        <div id="questionContainer" class="question-container">
+          <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+          </div>
+
+          <div class="question-header">
+            <span class="question-number" id="questionNumber"></span>
+            <span id="timer">⏱️ 0:00</span>
+          </div>
+
+          <div class="question-text" id="questionText"></div>
+
+          <div class="options" id="optionsContainer"></div>
+
+          <div class="buttons">
+            <button class="btn btn-secondary" onclick="previousQuestion()">
+              ← Précédent
+            </button>
+            <button
+              class="btn btn-primary"
+              id="nextBtn"
+              onclick="nextQuestion()"
+              disabled
+            >
+              Suivant →
+            </button>
+          </div>
+
+          <div style="text-align: center; margin-top: 20px">
+            <button
+              class="btn btn-secondary"
+              onclick="backToMenu()"
+              style="max-width: 300px"
+            >
+              🏠 Retour au Menu Principal
+            </button>
+          </div>
         </div>
 
-        <div class="content">
-            <div id="quizSelector" class="quiz-selector">
-                <div class="quiz-card" onclick="startQuiz('tp1')">
-                    <h3>🌐 TP1: Réseau de Base</h3>
-                    <p>30 questions sur connexion PC, switch basique, DNS/HTTP, ping, ipconfig</p>
-                </div>
-                <div class="quiz-card" onclick="startQuiz('tp2')">
-                    <h3>🔧 TP2: Configuration Switch</h3>
-                    <p>35 questions sur modes CLI, hostname, IP, passwords, show commands</p>
-                </div>
-                <div class="quiz-card" onclick="startQuiz('tp3')">
-                    <h3>🔒 TP3: VLANs & Sécurité</h3>
-                    <p>40 questions sur VLANs, trunk, port security, MAC filtering</p>
-                </div>
-                <div class="quiz-card" onclick="startQuiz('tp4')">
-                    <h3>📊 TP4: Subnetting & Routage</h3>
-                    <p>35 questions sur masques, sous-réseaux, routage de base</p>
-                </div>
-                <div class="quiz-card" onclick="startQuiz('tp5')">
-                    <h3>🛣️ TP5: Routage Avancé</h3>
-                    <p>45 questions sur routes statiques, RIP, ACLs, NAT/PAT</p>
-                </div>
-                <div class="quiz-card" onclick="startQuiz('vlsm')">
-                    <h3>🎯 TP6: VLSM</h3>
-                    <p>25 questions sur Variable Length Subnet Masking</p>
-                </div>
-                <div class="quiz-card" onclick="startQuiz('easy')">
-                    <h3>🟢 Mode Facile</h3>
-                    <p>50 questions basiques - Idéal pour débuter</p>
-                </div>
-                <div class="quiz-card" onclick="startQuiz('medium')">
-                    <h3>🟡 Mode Moyen</h3>
-                    <p>60 questions intermédiaires - Testez vos connaissances</p>
-                </div>
-                <div class="quiz-card" onclick="startQuiz('hard')">
-                    <h3>🔴 Mode Difficile</h3>
-                    <p>50 questions avancées - Pour les experts</p>
-                </div>
-                <div class="quiz-card" onclick="startQuiz('all')">
-                    <h3>⚡ Quiz Complet</h3>
-                    <p>Toutes les 210 questions - Simulation examen réel</p>
-                </div>
-            </div>
-
-            <div id="questionContainer" class="question-container">
-                <div class="progress-bar">
-                    <div id="progressFill" class="progress-fill"></div>
-                </div>
-                
-                <div class="question-header">
-                    <span class="question-number" id="questionNumber"></span>
-                    <span id="timer">⏱️ 0:00</span>
-                </div>
-
-                <div class="question-text" id="questionText"></div>
-
-                <div class="options" id="optionsContainer"></div>
-
-                <div class="buttons">
-                    <button class="btn btn-secondary" onclick="previousQuestion()">← Précédent</button>
-                    <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>Suivant →</button>
-                </div>
-            </div>
-
-            <div id="results" class="results">
-                <h2>🎉 Quiz Terminé!</h2>
-                <div id="scoreCircle" class="score-circle"></div>
-                <div class="feedback" id="feedback"></div>
-                <div class="buttons">
-                    <button class="btn btn-primary" onclick="restartQuiz()">Recommencer</button>
-                    <button class="btn btn-secondary" onclick="backToMenu()">Menu Principal</button>
-                </div>
-            </div>
+        <div id="results" class="results">
+          <h2>🎉 Quiz Terminé!</h2>
+          <div id="scoreCircle" class="score-circle"></div>
+          <div class="feedback" id="feedback"></div>
+          <div class="buttons">
+            <button class="btn btn-primary" onclick="restartQuiz()">
+              Recommencer
+            </button>
+            <button class="btn btn-secondary" onclick="backToMenu()">
+              Menu Principal
+            </button>
+          </div>
         </div>
+      </div>
     </div>
 
     <script>
-        const quizData = {
-            // TP1: Basic Networking
-            tp1: [
-                {q: "Quelle commande permet de tester la connectivité entre deux ordinateurs?", o: ["ipconfig", "ping", "tracert", "netstat"], c: 1, d: "easy"},
-                {q: "Quelle commande affiche la configuration réseau d'un PC Windows?", o: ["ifconfig", "ipconfig", "show ip", "config"], c: 1, d: "easy"},
-                {q: "Pour tester la configuration TCP/IP d'un ordinateur, quelle adresse ping?", o: ["192.168.1.1", "127.0.0.1", "0.0.0.0", "255.255.255.255"], c: 1, d: "easy"},
-                {q: "Quelle commande affiche la configuration réseau sous Linux?", o: ["ipconfig", "ifconfig", "netconfig", "showconfig"], c: 1, d: "easy"},
-                {q: "Pour voir la table ARP sur un PC, quelle commande?", o: ["show arp", "arp -a", "display arp", "get arp"], c: 1, d: "medium"},
-                {q: "Quelle commande affiche le chemin qu'un paquet prend?", o: ["ping", "tracert", "pathping", "route"], c: 1, d: "medium"},
-                {q: "Pour afficher les connexions actives sur un PC?", o: ["netstat", "showconn", "connections", "active"], c: 0, d: "medium"},
-                {q: "Quel protocole utilise la commande ping?", o: ["TCP", "UDP", "ICMP", "ARP"], c: 2, d: "medium"},
-                {q: "Pour vider le cache DNS sur Windows?", o: ["ipconfig /flushdns", "dns -clear", "clear dns", "flush dns"], c: 0, d: "medium"},
-                {q: "Quelle commande affiche la table de routage d'un PC?", o: ["show route", "route print", "display route", "get route"], c: 1, d: "hard"},
-                {q: "Pour accéder au Switch et changer son nom, quelle séquence?", o: ["enable, configure terminal, hostname [nom]", "config, name [nom]", "switch rename", "set hostname"], c: 0, d: "medium"},
-                {q: "Sauvegarder la configuration dans la NVRAM:", o: ["save", "write memory", "copy running-config startup-config", "backup config"], c: 2, d: "easy"},
-                {q: "Verrouiller l'accès au mode privilégié:", o: ["password enable", "enable secret [mot]", "enable password [mot]", "set password"], c: 1, d: "medium"},
-                {q: "Pour vérifier la connectivité entre Host1 et Host2:", o: ["ping", "test", "check", "verify"], c: 0, d: "easy"},
+      const quizData = {
+        // TP1: Basic Networking
+        tp1: [
+          {
+            q: "Quelle commande permet de tester la connectivité entre deux ordinateurs?",
+            o: ["ipconfig", "ping", "tracert", "netstat"],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Quelle commande affiche la configuration réseau d'un PC Windows?",
+            o: ["ifconfig", "ipconfig", "show ip", "config"],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Pour tester la configuration TCP/IP d'un ordinateur, quelle adresse ping?",
+            o: ["192.168.1.1", "127.0.0.1", "0.0.0.0", "255.255.255.255"],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Quelle commande affiche la configuration réseau sous Linux?",
+            o: ["ipconfig", "ifconfig", "netconfig", "showconfig"],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Pour voir la table ARP sur un PC, quelle commande?",
+            o: ["show arp", "arp -a", "display arp", "get arp"],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Quelle commande affiche le chemin qu'un paquet prend?",
+            o: ["ping", "tracert", "pathping", "route"],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Pour afficher les connexions actives sur un PC?",
+            o: ["netstat", "showconn", "connections", "active"],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Quel protocole utilise la commande ping?",
+            o: ["TCP", "UDP", "ICMP", "ARP"],
+            c: 2,
+            d: "medium",
+          },
+          {
+            q: "Pour vider le cache DNS sur Windows?",
+            o: ["ipconfig /flushdns", "dns -clear", "clear dns", "flush dns"],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Quelle commande affiche la table de routage d'un PC?",
+            o: ["show route", "route print", "display route", "get route"],
+            c: 1,
+            d: "hard",
+          },
+          {
+            q: "Pour accéder au Switch et changer son nom, quelle séquence?",
+            o: [
+              "enable, configure terminal, hostname [nom]",
+              "config, name [nom]",
+              "switch rename",
+              "set hostname",
             ],
-
-            // TP2: Switch Configuration & CLI Basics
-            tp2: [
-                {q: "Quelle commande passe en mode privilégié?", o: ["configure", "enable", "privileged", "admin"], c: 1, d: "easy"},
-                {q: "Quelle commande entre en mode configuration globale?", o: ["config t", "configure", "global config", "conf"], c: 0, d: "easy"},
-                {q: "Pour changer le nom d'un switch?", o: ["name [nom]", "hostname [nom]", "switch-name [nom]", "set name [nom]"], c: 1, d: "easy"},
-                {q: "Quelle commande affiche la configuration courante?", o: ["show config", "show running-config", "display config", "get config"], c: 1, d: "easy"},
-                {q: "Pour sauvegarder la configuration?", o: ["save config", "write memory", "copy running-config startup-config", "save"], c: 2, d: "easy"},
-                {q: "Quelle commande affiche les interfaces?", o: ["show ports", "show interfaces", "display int", "get interfaces"], c: 1, d: "easy"},
-                {q: "Pour définir un mot de passe enable?", o: ["password [mot]", "enable password [mot]", "set password [mot]", "enable secret [mot]"], c: 3, d: "medium"},
-                {q: "Quelle commande configure une IP sur VLAN 1?", o: ["ip address [IP] [masque]", "interface vlan 1, puis ip address [IP] [masque]", "set ip [IP] [masque]", "vlan 1 ip [IP]"], c: 1, d: "medium"},
-                {q: "Pour activer une interface désactivée?", o: ["enable interface", "no shutdown", "interface up", "activate"], c: 1, d: "easy"},
-                {q: "Quelle commande affiche la table MAC?", o: ["show mac", "show mac-address-table", "display mac", "get mac-table"], c: 1, d: "medium"},
-                {q: "Pour configurer la console avec mot de passe?", o: ["line console 0, puis password [mot] et login", "console password [mot]", "set console [mot]", "password console [mot]"], c: 0, d: "medium"},
-                {q: "Quelle commande configure les lignes VTY (Telnet)?", o: ["telnet password [mot]", "line vty 0 4, puis password [mot] et login", "vty password [mot]", "set vty [mot]"], c: 1, d: "medium"},
-                {q: "Pour afficher la version de l'IOS?", o: ["show version", "show ios", "display version", "get version"], c: 0, d: "easy"},
-                {q: "Quelle commande affiche un résumé des interfaces?", o: ["show ip int", "show ip interface brief", "show interfaces summary", "display int brief"], c: 1, d: "medium"},
-                {q: "Pour définir une passerelle par défaut sur un switch?", o: ["default-gateway [IP]", "ip default-gateway [IP]", "gateway [IP]", "ip route 0.0.0.0 0.0.0.0 [IP]"], c: 1, d: "medium"},
-                {q: "Afficher la configuration courante:", o: ["show config", "show running-config", "show current", "display config"], c: 1, d: "easy"},
-                {q: "Donner le nom TPn2manip2 au switch:", o: ["name TPn2manip2", "hostname TPn2manip2", "switch-name TPn2manip2", "set name TPn2manip2"], c: 1, d: "easy"},
-                {q: "Examiner en détail le résultat affiché des interfaces:", o: ["show interfaces", "show ports", "display interfaces", "list interfaces"], c: 0, d: "medium"},
-                {q: "Examiner la configuration de démarrage:", o: ["show running-config", "show startup-config", "show boot-config", "display startup"], c: 1, d: "medium"},
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Sauvegarder la configuration dans la NVRAM:",
+            o: [
+              "save",
+              "write memory",
+              "copy running-config startup-config",
+              "backup config",
             ],
-
-            // TP3: VLANs & Security
-            tp3: [
-                {q: "Quelle commande crée un VLAN?", o: ["create vlan [numéro]", "vlan [numéro]", "add vlan [numéro]", "new vlan [numéro]"], c: 1, d: "easy"},
-                {q: "Pour nommer un VLAN?", o: ["vlan [numéro], puis name [nom]", "vlan name [numéro] [nom]", "name vlan [numéro] [nom]", "set vlan [numéro] name [nom]"], c: 0, d: "easy"},
-                {q: "Quelle commande affiche les VLANs?", o: ["show vlan", "show vlan brief", "display vlan", "get vlan"], c: 1, d: "easy"},
-                {q: "Pour assigner un port au VLAN 10 en mode access?", o: ["switchport mode access, puis switchport access vlan 10", "vlan 10", "port vlan 10", "access vlan 10"], c: 0, d: "medium"},
-                {q: "Quelle commande configure un port en mode trunk?", o: ["trunk mode", "switchport mode trunk", "port trunk", "set trunk"], c: 1, d: "medium"},
-                {q: "Pour afficher les interfaces en mode trunk?", o: ["show trunk", "show interfaces trunk", "display trunk", "get trunk"], c: 1, d: "medium"},
-                {q: "Quelle commande active la sécurité des ports?", o: ["port-security", "switchport port-security", "security enable", "port security enable"], c: 1, d: "medium"},
-                {q: "Pour limiter le nombre d'adresses MAC à 2 sur un port?", o: ["switchport port-security maximum 2", "port-security max 2", "maximum mac 2", "limit mac 2"], c: 0, d: "medium"},
-                {q: "Quelle commande définit une MAC autorisée?", o: ["switchport port-security mac-address [MAC]", "mac-address [MAC]", "allow mac [MAC]", "permit mac [MAC]"], c: 0, d: "hard"},
-                {q: "Pour activer le sticky MAC learning?", o: ["switchport port-security mac-address sticky", "sticky mac", "port-security sticky", "mac sticky"], c: 0, d: "hard"},
-                {q: "Quelle action si violation de sécurité (shutdown)?", o: ["switchport port-security violation shutdown", "violation shutdown", "security shutdown", "port shutdown"], c: 0, d: "medium"},
-                {q: "Pour supprimer un VLAN?", o: ["delete vlan [numéro]", "no vlan [numéro]", "remove vlan [numéro]", "clear vlan [numéro]"], c: 1, d: "easy"},
-                {q: "Quelle commande affiche la config de port-security?", o: ["show port-security", "show port-security interface [int]", "show security", "display port-security"], c: 1, d: "medium"},
-                {q: "Pour configurer le VLAN natif sur un trunk?", o: ["switchport trunk native vlan [numéro]", "native vlan [numéro]", "trunk vlan native [numéro]", "set native [numéro]"], c: 0, d: "hard"},
-                {q: "Quelle commande désactive DTP sur un port?", o: ["switchport nonegotiate", "no dtp", "dtp off", "disable dtp"], c: 0, d: "hard"},
-                {q: "Configurez le nom d'hôte Switch-A:", o: ["name Switch-A", "hostname Switch-A", "set hostname Switch-A", "switch name Switch-A"], c: 1, d: "easy"},
-                {q: "Configurez mot de passe RDC pour enable:", o: ["password RDC", "enable secret RDC", "enable password RDC", "set password RDC"], c: 1, d: "medium"},
-                {q: "Affichez la version de l'IOS:", o: ["show version", "show ios", "display version", "get ios-version"], c: 0, d: "easy"},
-                {q: "Affichez les informations d'interface VLAN:", o: ["show vlan", "show vlan brief", "display vlan", "get vlan info"], c: 1, d: "easy"},
-                {q: "Créer VLAN 2 nommé Gestion:", o: ["vlan 2, puis name Gestion", "create vlan 2 Gestion", "add vlan 2 Gestion", "new vlan 2 Gestion"], c: 0, d: "easy"},
-                {q: "Affecter port fa0/2 au VLAN 2:", o: ["interface fa0/2, switchport mode access, switchport access vlan 2", "port vlan 2", "assign vlan 2", "set vlan 2"], c: 0, d: "medium"},
-                {q: "Vérifier que les nouveaux VLANs ont été ajoutés:", o: ["show vlan", "show vlan brief", "list vlan", "display vlan"], c: 1, d: "easy"},
-                {q: "Supprimer l'hôte du port fa0/6 du vlan3:", o: ["interface fa0/6, puis no switchport access vlan", "delete vlan 3", "remove port fa0/6", "clear vlan fa0/6"], c: 0, d: "medium"},
-                {q: "Supprimer le Vlan2 du Switch-A:", o: ["delete vlan 2", "no vlan 2", "remove vlan 2", "clear vlan 2"], c: 1, d: "medium"},
-                {q: "Mettre liaison entre commutateurs en mode trunk:", o: ["interface fa0/1, puis switchport mode trunk", "trunk enable", "set trunk", "port trunk"], c: 0, d: "medium"},
-                {q: "Désactiver les ports de f0/1 à f0/4:", o: ["interface range fa0/1-4, puis shutdown", "disable ports fa0/1-4", "shutdown fa0/1-4", "ports off fa0/1-4"], c: 0, d: "medium"},
-                {q: "Filtrage par adresse MAC sur un port:", o: ["switchport port-security, puis switchport port-security mac-address [MAC]", "mac-filter [MAC]", "block mac [MAC]", "deny mac [MAC]"], c: 0, d: "hard"},
-                {q: "Filtrage MAC automatique (sticky):", o: ["switchport port-security, puis switchport port-security mac-address sticky", "auto mac-security", "mac-address auto", "sticky-mac enable"], c: 0, d: "hard"},
-                {q: "Limiter le nombre d'hôtes par port à 4:", o: ["switchport port-security maximum 4", "port-security max 4", "maximum mac 4", "limit hosts 4"], c: 0, d: "medium"},
-                {q: "Bloquer le port f0/9 en cas de violation:", o: ["switchport port-security violation shutdown", "shutdown port", "block port", "disable port-security"], c: 0, d: "medium"},
+            c: 2,
+            d: "easy",
+          },
+          {
+            q: "Verrouiller l'accès au mode privilégié:",
+            o: [
+              "password enable",
+              "enable secret [mot]",
+              "enable password [mot]",
+              "set password",
             ],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Pour vérifier la connectivité entre Host1 et Host2:",
+            o: ["ping", "test", "check", "verify"],
+            c: 0,
+            d: "easy",
+          },
+        ],
 
-            // TP4: Subnetting & Basic Routing
-            tp4: [
-                {q: "Pour afficher la table de routage?", o: ["show route", "show ip route", "display route", "get route"], c: 1, d: "easy"},
-                {q: "Quelle commande configure une IP sur une interface?", o: ["ip address [IP] [masque]", "interface [int], puis ip address [IP] [masque]", "set ip [IP] [masque]", "ip [IP] [masque]"], c: 1, d: "easy"},
-                {q: "Pour activer une interface de routeur?", o: ["enable", "no shutdown", "interface up", "activate"], c: 1, d: "easy"},
-                {q: "Quelle commande entre en config d'interface?", o: ["config interface [int]", "interface [int]", "int [int]", "set interface [int]"], c: 1, d: "easy"},
-                {q: "Pour afficher un résumé des protocoles IP?", o: ["show ip protocols", "show protocols", "display ip protocols", "get protocols"], c: 0, d: "medium"},
-                {q: "Quelle commande vérifie la connectivité?", o: ["test", "ping [IP]", "check [IP]", "connect [IP]"], c: 1, d: "easy"},
-                {q: "Pour afficher les interfaces actives?", o: ["show ip interface", "show ip interface brief", "show interfaces", "display int"], c: 1, d: "easy"},
-                {q: "Quelle commande trace le chemin vers une destination?", o: ["traceroute [IP]", "trace [IP]", "path [IP]", "route [IP]"], c: 0, d: "medium"},
-                {q: "Pour configurer une description sur une interface?", o: ["description [texte]", "interface [int], puis description [texte]", "set description [texte]", "desc [texte]"], c: 1, d: "easy"},
-                {q: "Quelle commande affiche les statistiques d'interface?", o: ["show stats", "show interface [int]", "display stats", "get interface stats"], c: 1, d: "medium"},
-                {q: "Se connecter au routeur via Terminal/console:", o: ["Utiliser cable console et logiciel Terminal/PuTTY", "ssh [IP]", "telnet [IP]", "remote [IP]"], c: 0, d: "easy"},
-                {q: "Changer nom routeur et sécuriser accès:", o: ["hostname Router1, line console 0, password, login, enable secret", "name Router1, password", "set hostname, set password", "router name, enable password"], c: 0, d: "medium"},
-                {q: "Attribuer IP aux deux interfaces du routeur:", o: ["interface fa0/0, ip address [IP] [masque], no shutdown", "set ip [IP]", "ip [IP] [masque]", "address [IP]"], c: 0, d: "medium"},
-                {q: "Vérifier connectivité Host1 et Host2:", o: ["ping depuis Host1 vers Host2", "tracert", "show ip", "test connection"], c: 0, d: "easy"},
-                {q: "Vérifier connexion Telnet au routeur:", o: ["telnet [IP_routeur] depuis Host", "ssh [IP_routeur]", "connect [IP_routeur]", "remote [IP_routeur]"], c: 0, d: "medium"},
+        // TP2: Switch Configuration & CLI Basics
+        tp2: [
+          {
+            q: "Quelle commande passe en mode privilégié?",
+            o: ["configure", "enable", "privileged", "admin"],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Quelle commande entre en mode configuration globale?",
+            o: ["config t", "configure", "global config", "conf"],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Pour changer le nom d'un switch?",
+            o: [
+              "name [nom]",
+              "hostname [nom]",
+              "switch-name [nom]",
+              "set name [nom]",
             ],
-
-            // TP5: Static & Dynamic Routing, ACLs, NAT/PAT
-            tp5: [
-                {q: "Pour configurer une route statique?", o: ["ip route [réseau] [masque] [next-hop]", "route add [réseau] [masque] [next-hop]", "static route [réseau] [next-hop]", "add route [réseau]"], c: 0, d: "medium"},
-                {q: "Quelle commande configure une route par défaut?", o: ["ip route 0.0.0.0 0.0.0.0 [next-hop]", "default route [next-hop]", "ip default-route [next-hop]", "route default [next-hop]"], c: 0, d: "medium"},
-                {q: "Pour activer RIP?", o: ["router rip", "enable rip", "rip enable", "activate rip"], c: 0, d: "medium"},
-                {q: "Quelle commande spécifie un réseau dans RIP?", o: ["network [réseau]", "rip network [réseau]", "advertise [réseau]", "add network [réseau]"], c: 0, d: "medium"},
-                {q: "Pour activer RIP version 2?", o: ["version 2", "rip version 2", "set version 2", "v2"], c: 0, d: "medium"},
-                {q: "Quelle commande désactive l'auto-summary?", o: ["no auto-summary", "auto-summary off", "disable auto-summary", "no summary"], c: 0, d: "medium"},
-                {q: "Pour créer une ACL standard?", o: ["access-list [numéro] permit/deny [IP]", "acl [numéro] permit [IP]", "create acl [numéro]", "ip access-list [numéro]"], c: 0, d: "medium"},
-                {q: "Quelle commande applique une ACL sur une interface?", o: ["ip access-group [numéro] in/out", "apply acl [numéro]", "acl [numéro] in", "access-list apply [numéro]"], c: 0, d: "hard"},
-                {q: "Pour afficher les ACLs?", o: ["show access-lists", "show acl", "display acl", "get access-lists"], c: 0, d: "easy"},
-                {q: "Quelle commande configure NAT statique?", o: ["ip nat inside source static [IP-locale] [IP-globale]", "nat static [IP-locale] [IP-globale]", "static nat [IP-locale] [IP-globale]", "ip nat static [IP-locale] [IP-globale]"], c: 0, d: "hard"},
-                {q: "Pour configurer NAT dynamique avec pool?", o: ["ip nat pool [nom] [début] [fin] netmask [masque]", "nat pool [nom] [début] [fin]", "create nat pool [nom]", "pool nat [nom]"], c: 0, d: "hard"},
-                {q: "Quelle commande configure PAT (overload)?", o: ["ip nat inside source list [ACL] interface [int] overload", "nat overload [int]", "pat [int]", "ip nat overload"], c: 0, d: "hard"},
-                {q: "Pour désigner une interface inside NAT?", o: ["ip nat inside", "nat inside", "inside nat", "nat-inside"], c: 0, d: "medium"},
-                {q: "Pour désigner une interface outside NAT?", o: ["ip nat outside", "nat outside", "outside nat", "nat-outside"], c: 0, d: "medium"},
-                {q: "Quelle commande affiche les traductions NAT?", o: ["show ip nat translations", "show nat", "display nat", "get nat translations"], c: 0, d: "medium"},
-                {q: "Pour effacer les traductions NAT?", o: ["clear ip nat translation *", "clear nat", "delete nat", "remove nat translations"], c: 0, d: "medium"},
-                {q: "Quelle commande crée une ACL étendue nommée?", o: ["ip access-list extended [nom]", "access-list extended [nom]", "create acl extended [nom]", "acl extended [nom]"], c: 0, d: "hard"},
-                {q: "Pour supprimer une route statique?", o: ["no ip route [réseau] [masque] [next-hop]", "delete route [réseau]", "remove route [réseau]", "clear route [réseau]"], c: 0, d: "medium"},
-                {q: "Quelle commande affiche les routes RIP?", o: ["show ip rip", "show ip protocols", "show rip", "display rip"], c: 1, d: "medium"},
-                {q: "Pour déboguer RIP?", o: ["debug ip rip", "debug rip", "trace rip", "monitor rip"], c: 0, d: "hard"},
-                {q: "Quelle commande désactive le débogage?", o: ["undebug all", "no debug", "debug off", "stop debug"], c: 0, d: "medium"},
-                {q: "Vérifier type d'interfaces (DCE/DTE):", o: ["show controllers serial [interface]", "show interface type", "display interface", "get interface info"], c: 0, d: "medium"},
-                {q: "Configurer clock rate pour DCE:", o: ["interface serial0/1/0, puis clock rate 64000", "set clock 64000", "clock 64000", "rate 64000"], c: 0, d: "medium"},
-                {q: "Afficher résumé des interfaces routeur:", o: ["show ip interface brief", "show interfaces summary", "display interfaces", "list interfaces"], c: 0, d: "easy"},
-                {q: "Annuler routage statique et activer RIP:", o: ["no ip route [réseau] [masque] [next-hop], puis router rip, version 2, network [réseaux], no auto-summary", "delete route, enable rip", "remove static, rip enable", "clear routes, start rip"], c: 0, d: "hard"},
-                {q: "Configurer accès Telnet au routeur:", o: ["line vty 0 4, password [mot], login", "telnet password [mot]", "vty password [mot]", "set telnet password"], c: 0, d: "medium"},
-                {q: "Créer ACL standard refusant trafic PC0:", o: ["access-list 1 deny host [IP_PC0], puis access-list 1 permit any", "acl deny [IP_PC0]", "block [IP_PC0]", "deny traffic [IP_PC0]"], c: 0, d: "hard"},
-                {q: "Créer ACL refusant telnet du PC8 vers R1:", o: ["access-list 1 deny [IP_PC8] 0.0.0.0, puis access-list 1 permit any, puis appliquer sur interface", "deny telnet [IP_PC8]", "block telnet from PC8", "acl telnet deny"], c: 0, d: "hard"},
-                {q: "NAT statique pour IP locale vers IP globale:", o: ["ip nat inside source static [IP_locale] [IP_globale]", "nat static [IP_locale] [IP_globale]", "static nat [IPs]", "configure nat static"], c: 0, d: "hard"},
-                {q: "NAT dynamique avec pool nommé:", o: ["ip nat pool [nom] [début] [fin] netmask [masque], puis ip nat inside source list [ACL] pool [nom]", "nat pool [nom] [range]", "dynamic nat pool", "create nat pool"], c: 0, d: "hard"},
-                {q: "PAT (overload) avec ACL et interface:", o: ["ip nat inside source list [ACL] interface [interface] overload", "nat overload", "pat enable", "overload nat"], c: 0, d: "hard"},
-                {q: "Vérifier résultat NAT avec débogage:", o: ["do debug ip nat (en mode config) ou debug ip nat (en mode privileged)", "show nat debug", "display nat", "trace nat"], c: 0, d: "hard"},
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Quelle commande affiche la configuration courante?",
+            o: [
+              "show config",
+              "show running-config",
+              "display config",
+              "get config",
             ],
-
-            // TP6: VLSM
-            vlsm: [
-                {q: "VLSM signifie?", o: ["Variable Length Subnet Mask", "Very Large Subnet Mask", "Virtual LAN Subnet Mask", "Variable Link Subnet Method"], c: 0, d: "easy"},
-                {q: "Quel avantage principal de VLSM?", o: ["Optimiser l'utilisation des adresses IP", "Augmenter la vitesse", "Réduire les collisions", "Simplifier le routage"], c: 0, d: "medium"},
-                {q: "Pour 50 hôtes, quel masque minimum?", o: ["/25", "/26", "/27", "/28"], c: 1, d: "medium"},
-                {q: "Pour 25 hôtes, quel masque minimum?", o: ["/26", "/27", "/28", "/29"], c: 1, d: "medium"},
-                {q: "Pour 12 hôtes, quel masque minimum?", o: ["/27", "/28", "/29", "/30"], c: 1, d: "medium"},
-                {q: "Pour 5 hôtes, quel masque minimum?", o: ["/28", "/29", "/30", "/31"], c: 1, d: "medium"},
-                {q: "Pour une liaison point-à-point, quel masque?", o: ["/30", "/31", "/32", "/29"], c: 0, d: "medium"},
-                {q: "Un /26 permet combien d'hôtes?", o: ["62", "64", "126", "128"], c: 0, d: "hard"},
-                {q: "Un /27 permet combien d'hôtes?", o: ["30", "32", "14", "16"], c: 0, d: "hard"},
-                {q: "Un /28 permet combien d'hôtes?", o: ["14", "16", "30", "32"], c: 0, d: "hard"},
-                {q: "Un /29 permet combien d'hôtes?", o: ["6", "8", "14", "16"], c: 0, d: "hard"},
-                {q: "Un /30 permet combien d'hôtes?", o: ["2", "4", "6", "8"], c: 0, d: "medium"},
-                {q: "Quel protocole supporte VLSM?", o: ["RIPv1", "RIPv2", "IGRP", "Aucun"], c: 1, d: "medium"},
-                {q: "Le masque 255.255.255.252 correspond à?", o: ["/30", "/29", "/28", "/31"], c: 0, d: "hard"},
-                {q: "Le masque 255.255.255.240 correspond à?", o: ["/28", "/27", "/26", "/29"], c: 0, d: "hard"},
-                {q: "Le masque 255.255.255.224 correspond à?", o: ["/27", "/28", "/26", "/25"], c: 0, d: "hard"},
-                {q: "Le masque 255.255.255.192 correspond à?", o: ["/26", "/27", "/25", "/28"], c: 0, d: "hard"},
-                {q: "Pour subdiviser 192.168.1.0/24 en 4 sous-réseaux égaux?", o: ["/26", "/25", "/27", "/28"], c: 0, d: "hard"},
-                {q: "Combien de sous-réseaux avec un /26 depuis /24?", o: ["4", "2", "8", "16"], c: 0, d: "hard"},
-                {q: "VLSM permet d'utiliser différents masques sur?", o: ["Différents sous-réseaux", "Même sous-réseau", "Même interface", "Même routeur uniquement"], c: 0, d: "medium"},
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Pour sauvegarder la configuration?",
+            o: [
+              "save config",
+              "write memory",
+              "copy running-config startup-config",
+              "save",
             ],
-
-            // Mode EASY - Questions faciles tous TPs
-            easy: [
-                {q: "Quelle commande teste la connectivité?", o: ["ping", "test", "connect", "check"], c: 0, d: "easy"},
-                {q: "Commande pour passer en mode privilégié?", o: ["enable", "privileged", "admin", "super"], c: 0, d: "easy"},
-                {q: "Commande pour entrer en configuration globale?", o: ["configure terminal", "config", "global", "setup"], c: 0, d: "easy"},
-                {q: "Pour changer le nom d'un switch?", o: ["hostname [nom]", "name [nom]", "switchname [nom]", "setname [nom]"], c: 0, d: "easy"},
-                {q: "Commande pour sauvegarder la config?", o: ["copy running-config startup-config", "save", "write", "backup"], c: 0, d: "easy"},
-                {q: "Pour activer une interface?", o: ["no shutdown", "enable", "up", "activate"], c: 0, d: "easy"},
-                {q: "Afficher la config courante?", o: ["show running-config", "show config", "display config", "get config"], c: 0, d: "easy"},
-                {q: "Pour créer VLAN 10?", o: ["vlan 10", "create vlan 10", "add vlan 10", "new vlan 10"], c: 0, d: "easy"},
-                {q: "Afficher les VLANs?", o: ["show vlan brief", "show vlan", "display vlan", "list vlan"], c: 0, d: "easy"},
-                {q: "Configurer port en mode access?", o: ["switchport mode access", "access mode", "port access", "mode access"], c: 0, d: "easy"},
-                {q: "Afficher la table de routage?", o: ["show ip route", "show route", "display route", "get route"], c: 0, d: "easy"},
-                {q: "Commande pour voir les interfaces?", o: ["show ip interface brief", "show interfaces", "display int", "list int"], c: 0, d: "easy"},
-                {q: "Pour configurer une IP sur interface?", o: ["ip address [IP] [masque]", "set ip [IP]", "interface ip [IP]", "ip [IP]"], c: 0, d: "easy"},
-                {q: "Tester la pile TCP/IP locale?", o: ["ping 127.0.0.1", "ping localhost", "test tcp", "check ip"], c: 0, d: "easy"},
-                {q: "Afficher config IP d'un PC Windows?", o: ["ipconfig", "ifconfig", "showip", "getip"], c: 0, d: "easy"},
-                {q: "Pour voir la version IOS?", o: ["show version", "show ios", "version", "get version"], c: 0, d: "easy"},
-                {q: "Définir mot de passe enable crypté?", o: ["enable secret [mot]", "enable password [mot]", "password enable [mot]", "secret [mot]"], c: 0, d: "easy"},
-                {q: "Mode pour configurer une interface?", o: ["interface [nom]", "config interface [nom]", "int [nom]", "if [nom]"], c: 0, d: "easy"},
-                {q: "Afficher la table MAC?", o: ["show mac-address-table", "show mac", "display mac", "list mac"], c: 0, d: "easy"},
-                {q: "Pour nommer un VLAN?", o: ["name [nom]", "vlan name [nom]", "setname [nom]", "title [nom]"], c: 0, d: "easy"},
+            c: 2,
+            d: "easy",
+          },
+          {
+            q: "Quelle commande affiche les interfaces?",
+            o: [
+              "show ports",
+              "show interfaces",
+              "display int",
+              "get interfaces",
             ],
-
-            // Mode MEDIUM - Questions moyennes
-            medium: [
-                {q: "Configurer passerelle par défaut sur switch?", o: ["ip default-gateway [IP]", "default-gateway [IP]", "gateway [IP]", "ip gateway [IP]"], c: 0, d: "medium"},
-                {q: "Assigner port au VLAN 20 en access?", o: ["switchport access vlan 20", "vlan 20", "access vlan 20", "port vlan 20"], c: 0, d: "medium"},
-                {q: "Configurer un port en trunk?", o: ["switchport mode trunk", "trunk mode", "mode trunk", "port trunk"], c: 0, d: "medium"},
-                {q: "Activer la sécurité sur un port?", o: ["switchport port-security", "port-security", "security enable", "enable security"], c: 0, d: "medium"},
-                {q: "Limiter à 3 adresses MAC sur port?", o: ["switchport port-security maximum 3", "port-security max 3", "maximum mac 3", "limit 3"], c: 0, d: "medium"},
-                {q: "Configurer ligne console avec password?", o: ["line console 0, password [mot], login", "console password [mot]", "line con 0, pass [mot]", "console [mot]"], c: 0, d: "medium"},
-                {q: "Configurer lignes VTY 0-4 pour Telnet?", o: ["line vty 0 4, password [mot], login", "vty password [mot]", "telnet password [mot]", "line vty [mot]"], c: 0, d: "medium"},
-                {q: "Afficher les interfaces en trunk?", o: ["show interfaces trunk", "show trunk", "display trunk", "list trunk"], c: 0, d: "medium"},
-                {q: "Créer route statique?", o: ["ip route [net] [mask] [next-hop]", "route [net] [next-hop]", "static route [net]", "add route [net]"], c: 0, d: "medium"},
-                {q: "Configurer route par défaut?", o: ["ip route 0.0.0.0 0.0.0.0 [next-hop]", "default route [next-hop]", "ip default [next-hop]", "route default"], c: 0, d: "medium"},
-                {q: "Activer RIP sur routeur?", o: ["router rip", "enable rip", "rip on", "activate rip"], c: 0, d: "medium"},
-                {q: "Déclarer réseau dans RIP?", o: ["network [réseau]", "rip network [réseau]", "advertise [réseau]", "add [réseau]"], c: 0, d: "medium"},
-                {q: "Activer RIP version 2?", o: ["version 2", "rip v2", "v2", "rip version 2"], c: 0, d: "medium"},
-                {q: "Désactiver auto-summary RIP?", o: ["no auto-summary", "auto-summary off", "disable summary", "no summary"], c: 0, d: "medium"},
-                {q: "Afficher table ARP?", o: ["show arp", "show ip arp", "display arp", "arp -a"], c: 0, d: "medium"},
-                {q: "Vider cache DNS Windows?", o: ["ipconfig /flushdns", "dns flush", "clear dns", "flush dns"], c: 0, d: "medium"},
-                {q: "Afficher table routage Windows?", o: ["route print", "show route", "netstat -r", "display route"], c: 0, d: "medium"},
-                {q: "Tracer route sous Windows?", o: ["tracert [IP]", "traceroute [IP]", "trace [IP]", "path [IP]"], c: 0, d: "medium"},
-                {q: "Afficher connexions actives?", o: ["netstat", "show connections", "connections", "active"], c: 0, d: "medium"},
-                {q: "Configurer clock rate DCE?", o: ["clock rate 64000", "clock 64000", "rate 64000", "set clock 64000"], c: 0, d: "medium"},
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Pour définir un mot de passe enable?",
+            o: [
+              "password [mot]",
+              "enable password [mot]",
+              "set password [mot]",
+              "enable secret [mot]",
             ],
-
-            // Mode HARD - Questions difficiles
-            hard: [
-                {q: "Sticky MAC learning activation?", o: ["switchport port-security mac-address sticky", "mac-address sticky", "sticky mac", "port-security sticky"], c: 0, d: "hard"},
-                {q: "Action violation shutdown port-security?", o: ["switchport port-security violation shutdown", "violation shutdown", "security shutdown", "port violation shutdown"], c: 0, d: "hard"},
-                {q: "Configurer VLAN natif 99 sur trunk?", o: ["switchport trunk native vlan 99", "native vlan 99", "trunk native 99", "vlan native 99"], c: 0, d: "hard"},
-                {q: "Désactiver DTP sur port?", o: ["switchport nonegotiate", "no dtp", "dtp off", "nonegotiate"], c: 0, d: "hard"},
-                {q: "ACL standard pour autoriser 192.168.1.0/24?", o: ["access-list 1 permit 192.168.1.0 0.0.0.255", "acl 1 permit 192.168.1.0", "access-list permit 192.168.1.0", "acl permit 192.168.1.0/24"], c: 0, d: "hard"},
-                {q: "Appliquer ACL 10 en entrée sur fa0/0?", o: ["ip access-group 10 in", "access-group 10 in", "apply acl 10 in", "acl 10 in"], c: 0, d: "hard"},
-                {q: "NAT statique pour 192.168.1.10 vers 200.1.1.10?", o: ["ip nat inside source static 192.168.1.10 200.1.1.10", "nat static 192.168.1.10 200.1.1.10", "ip nat static 192.168.1.10 200.1.1.10", "static nat 192.168.1.10 200.1.1.10"], c: 0, d: "hard"},
-                {q: "Pool NAT nommé PUBLIC 200.1.1.1-200.1.1.10?", o: ["ip nat pool PUBLIC 200.1.1.1 200.1.1.10 netmask 255.255.255.0", "nat pool PUBLIC 200.1.1.1 200.1.1.10", "ip nat pool PUBLIC 200.1.1.1-10", "pool PUBLIC 200.1.1.1 200.1.1.10"], c: 0, d: "hard"},
-                {q: "PAT avec ACL 1 sur interface fa0/1?", o: ["ip nat inside source list 1 interface fa0/1 overload", "nat overload fa0/1 list 1", "ip nat overload 1 fa0/1", "pat 1 fa0/1"], c: 0, d: "hard"},
-                {q: "ACL étendue nommée BLOQUE_WEB?", o: ["ip access-list extended BLOQUE_WEB", "access-list extended BLOQUE_WEB", "acl extended BLOQUE_WEB", "create acl BLOQUE_WEB"], c: 0, d: "hard"},
-                {q: "Dans ACL étendue, bloquer HTTP de 192.168.1.0/24?", o: ["deny tcp 192.168.1.0 0.0.0.255 any eq 80", "deny http 192.168.1.0 0.0.0.255", "block tcp 192.168.1.0 80", "deny 192.168.1.0 port 80"], c: 0, d: "hard"},
-                {q: "Afficher traductions NAT actives?", o: ["show ip nat translations", "show nat translations", "display nat", "show nat active"], c: 0, d: "hard"},
-                {q: "Effacer toutes traductions NAT?", o: ["clear ip nat translation *", "clear nat all", "delete nat translations", "flush nat"], c: 0, d: "hard"},
-                {q: "Déboguer RIP en temps réel?", o: ["debug ip rip", "debug rip", "trace rip", "monitor rip"], c: 0, d: "hard"},
-                {q: "Arrêter tous les déboguages?", o: ["undebug all", "no debug all", "stop debug", "debug off"], c: 0, d: "hard"},
-                {q: "Metric RIP basée sur quoi?", o: ["Nombre de sauts", "Bande passante", "Délai", "Coût"], c: 0, d: "hard"},
-                {q: "Désactiver recherche DNS sur routeur?", o: ["no ip domain-lookup", "dns off", "no dns lookup", "disable dns"], c: 0, d: "hard"},
-                {q: "Configurer bannière MOTD?", o: ["banner motd # [texte] #", "banner [texte]", "motd [texte]", "message [texte]"], c: 0, d: "hard"},
-                {q: "Encrypter tous les mots de passe?", o: ["service password-encryption", "encrypt passwords", "password encryption", "secure passwords"], c: 0, d: "hard"},
-                {q: "Définir timeout console 5 min?", o: ["exec-timeout 5 0", "timeout 5", "console timeout 5", "timeout 300"], c: 0, d: "hard"},
+            c: 3,
+            d: "medium",
+          },
+          {
+            q: "Quelle commande configure une IP sur VLAN 1?",
+            o: [
+              "ip address [IP] [masque]",
+              "interface vlan 1, puis ip address [IP] [masque]",
+              "set ip [IP] [masque]",
+              "vlan 1 ip [IP]",
             ],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Pour activer une interface désactivée?",
+            o: ["enable interface", "no shutdown", "interface up", "activate"],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Quelle commande affiche la table MAC?",
+            o: [
+              "show mac",
+              "show mac-address-table",
+              "display mac",
+              "get mac-table",
+            ],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Pour configurer la console avec mot de passe?",
+            o: [
+              "line console 0, puis password [mot] et login",
+              "console password [mot]",
+              "set console [mot]",
+              "password console [mot]",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Quelle commande configure les lignes VTY (Telnet)?",
+            o: [
+              "telnet password [mot]",
+              "line vty 0 4, puis password [mot] et login",
+              "vty password [mot]",
+              "set vty [mot]",
+            ],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Pour afficher la version de l'IOS?",
+            o: ["show version", "show ios", "display version", "get version"],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Quelle commande affiche un résumé des interfaces?",
+            o: [
+              "show ip int",
+              "show ip interface brief",
+              "show interfaces summary",
+              "display int brief",
+            ],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Pour définir une passerelle par défaut sur un switch?",
+            o: [
+              "default-gateway [IP]",
+              "ip default-gateway [IP]",
+              "gateway [IP]",
+              "ip route 0.0.0.0 0.0.0.0 [IP]",
+            ],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Afficher la configuration courante:",
+            o: [
+              "show config",
+              "show running-config",
+              "show current",
+              "display config",
+            ],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Donner le nom TPn2manip2 au switch:",
+            o: [
+              "name TPn2manip2",
+              "hostname TPn2manip2",
+              "switch-name TPn2manip2",
+              "set name TPn2manip2",
+            ],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Examiner en détail le résultat affiché des interfaces:",
+            o: [
+              "show interfaces",
+              "show ports",
+              "display interfaces",
+              "list interfaces",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Examiner la configuration de démarrage:",
+            o: [
+              "show running-config",
+              "show startup-config",
+              "show boot-config",
+              "display startup",
+            ],
+            c: 1,
+            d: "medium",
+          },
+        ],
 
-            // ALL - Combine tous les quiz
-            all: []
-        };
+        // TP3: VLANs & Security
+        tp3: [
+          {
+            q: "Quelle commande crée un VLAN?",
+            o: [
+              "create vlan [numéro]",
+              "vlan [numéro]",
+              "add vlan [numéro]",
+              "new vlan [numéro]",
+            ],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Pour nommer un VLAN?",
+            o: [
+              "vlan [numéro], puis name [nom]",
+              "vlan name [numéro] [nom]",
+              "name vlan [numéro] [nom]",
+              "set vlan [numéro] name [nom]",
+            ],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Quelle commande affiche les VLANs?",
+            o: ["show vlan", "show vlan brief", "display vlan", "get vlan"],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Pour assigner un port au VLAN 10 en mode access?",
+            o: [
+              "switchport mode access, puis switchport access vlan 10",
+              "vlan 10",
+              "port vlan 10",
+              "access vlan 10",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Quelle commande configure un port en mode trunk?",
+            o: [
+              "trunk mode",
+              "switchport mode trunk",
+              "port trunk",
+              "set trunk",
+            ],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Pour afficher les interfaces en mode trunk?",
+            o: [
+              "show trunk",
+              "show interfaces trunk",
+              "display trunk",
+              "get trunk",
+            ],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Quelle commande active la sécurité des ports?",
+            o: [
+              "port-security",
+              "switchport port-security",
+              "security enable",
+              "port security enable",
+            ],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Pour limiter le nombre d'adresses MAC à 2 sur un port?",
+            o: [
+              "switchport port-security maximum 2",
+              "port-security max 2",
+              "maximum mac 2",
+              "limit mac 2",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Quelle commande définit une MAC autorisée?",
+            o: [
+              "switchport port-security mac-address [MAC]",
+              "mac-address [MAC]",
+              "allow mac [MAC]",
+              "permit mac [MAC]",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Pour activer le sticky MAC learning?",
+            o: [
+              "switchport port-security mac-address sticky",
+              "sticky mac",
+              "port-security sticky",
+              "mac sticky",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Quelle action si violation de sécurité (shutdown)?",
+            o: [
+              "switchport port-security violation shutdown",
+              "violation shutdown",
+              "security shutdown",
+              "port shutdown",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Pour supprimer un VLAN?",
+            o: [
+              "delete vlan [numéro]",
+              "no vlan [numéro]",
+              "remove vlan [numéro]",
+              "clear vlan [numéro]",
+            ],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Quelle commande affiche la config de port-security?",
+            o: [
+              "show port-security",
+              "show port-security interface [int]",
+              "show security",
+              "display port-security",
+            ],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Pour configurer le VLAN natif sur un trunk?",
+            o: [
+              "switchport trunk native vlan [numéro]",
+              "native vlan [numéro]",
+              "trunk vlan native [numéro]",
+              "set native [numéro]",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Quelle commande désactive DTP sur un port?",
+            o: ["switchport nonegotiate", "no dtp", "dtp off", "disable dtp"],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Configurez le nom d'hôte Switch-A:",
+            o: [
+              "name Switch-A",
+              "hostname Switch-A",
+              "set hostname Switch-A",
+              "switch name Switch-A",
+            ],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Configurez mot de passe RDC pour enable:",
+            o: [
+              "password RDC",
+              "enable secret RDC",
+              "enable password RDC",
+              "set password RDC",
+            ],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Affichez la version de l'IOS:",
+            o: [
+              "show version",
+              "show ios",
+              "display version",
+              "get ios-version",
+            ],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Affichez les informations d'interface VLAN:",
+            o: [
+              "show vlan",
+              "show vlan brief",
+              "display vlan",
+              "get vlan info",
+            ],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Créer VLAN 2 nommé Gestion:",
+            o: [
+              "vlan 2, puis name Gestion",
+              "create vlan 2 Gestion",
+              "add vlan 2 Gestion",
+              "new vlan 2 Gestion",
+            ],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Affecter port fa0/2 au VLAN 2:",
+            o: [
+              "interface fa0/2, switchport mode access, switchport access vlan 2",
+              "port vlan 2",
+              "assign vlan 2",
+              "set vlan 2",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Vérifier que les nouveaux VLANs ont été ajoutés:",
+            o: ["show vlan", "show vlan brief", "list vlan", "display vlan"],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Supprimer l'hôte du port fa0/6 du vlan3:",
+            o: [
+              "interface fa0/6, puis no switchport access vlan",
+              "delete vlan 3",
+              "remove port fa0/6",
+              "clear vlan fa0/6",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Supprimer le Vlan2 du Switch-A:",
+            o: ["delete vlan 2", "no vlan 2", "remove vlan 2", "clear vlan 2"],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Mettre liaison entre commutateurs en mode trunk:",
+            o: [
+              "interface fa0/1, puis switchport mode trunk",
+              "trunk enable",
+              "set trunk",
+              "port trunk",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Désactiver les ports de f0/1 à f0/4:",
+            o: [
+              "interface range fa0/1-4, puis shutdown",
+              "disable ports fa0/1-4",
+              "shutdown fa0/1-4",
+              "ports off fa0/1-4",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Filtrage par adresse MAC sur un port:",
+            o: [
+              "switchport port-security, puis switchport port-security mac-address [MAC]",
+              "mac-filter [MAC]",
+              "block mac [MAC]",
+              "deny mac [MAC]",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Filtrage MAC automatique (sticky):",
+            o: [
+              "switchport port-security, puis switchport port-security mac-address sticky",
+              "auto mac-security",
+              "mac-address auto",
+              "sticky-mac enable",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Limiter le nombre d'hôtes par port à 4:",
+            o: [
+              "switchport port-security maximum 4",
+              "port-security max 4",
+              "maximum mac 4",
+              "limit hosts 4",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Bloquer le port f0/9 en cas de violation:",
+            o: [
+              "switchport port-security violation shutdown",
+              "shutdown port",
+              "block port",
+              "disable port-security",
+            ],
+            c: 0,
+            d: "medium",
+          },
+        ],
 
-        // Combine all quizzes for 'all' mode
-        quizData.all = [
-            ...quizData.tp1,
-            ...quizData.tp2,
-            ...quizData.tp3,
-            ...quizData.tp4,
-            ...quizData.tp5,
-            ...quizData.vlsm
-        ];
+        // TP4: Subnetting & Basic Routing
+        tp4: [
+          {
+            q: "Pour afficher la table de routage?",
+            o: ["show route", "show ip route", "display route", "get route"],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Quelle commande configure une IP sur une interface?",
+            o: [
+              "ip address [IP] [masque]",
+              "interface [int], puis ip address [IP] [masque]",
+              "set ip [IP] [masque]",
+              "ip [IP] [masque]",
+            ],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Pour activer une interface de routeur?",
+            o: ["enable", "no shutdown", "interface up", "activate"],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Quelle commande entre en config d'interface?",
+            o: [
+              "config interface [int]",
+              "interface [int]",
+              "int [int]",
+              "set interface [int]",
+            ],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Pour afficher un résumé des protocoles IP?",
+            o: [
+              "show ip protocols",
+              "show protocols",
+              "display ip protocols",
+              "get protocols",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Quelle commande vérifie la connectivité?",
+            o: ["test", "ping [IP]", "check [IP]", "connect [IP]"],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Pour afficher les interfaces actives?",
+            o: [
+              "show ip interface",
+              "show ip interface brief",
+              "show interfaces",
+              "display int",
+            ],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Quelle commande trace le chemin vers une destination?",
+            o: ["traceroute [IP]", "trace [IP]", "path [IP]", "route [IP]"],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Pour configurer une description sur une interface?",
+            o: [
+              "description [texte]",
+              "interface [int], puis description [texte]",
+              "set description [texte]",
+              "desc [texte]",
+            ],
+            c: 1,
+            d: "easy",
+          },
+          {
+            q: "Quelle commande affiche les statistiques d'interface?",
+            o: [
+              "show stats",
+              "show interface [int]",
+              "display stats",
+              "get interface stats",
+            ],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Se connecter au routeur via Terminal/console:",
+            o: [
+              "Utiliser cable console et logiciel Terminal/PuTTY",
+              "ssh [IP]",
+              "telnet [IP]",
+              "remote [IP]",
+            ],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Changer nom routeur et sécuriser accès:",
+            o: [
+              "hostname Router1, line console 0, password, login, enable secret",
+              "name Router1, password",
+              "set hostname, set password",
+              "router name, enable password",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Attribuer IP aux deux interfaces du routeur:",
+            o: [
+              "interface fa0/0, ip address [IP] [masque], no shutdown",
+              "set ip [IP]",
+              "ip [IP] [masque]",
+              "address [IP]",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Vérifier connectivité Host1 et Host2:",
+            o: [
+              "ping depuis Host1 vers Host2",
+              "tracert",
+              "show ip",
+              "test connection",
+            ],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Vérifier connexion Telnet au routeur:",
+            o: [
+              "telnet [IP_routeur] depuis Host",
+              "ssh [IP_routeur]",
+              "connect [IP_routeur]",
+              "remote [IP_routeur]",
+            ],
+            c: 0,
+            d: "medium",
+          },
+        ],
 
-        let currentQuiz = [];
-        let currentQuestion = 0;
-        let score = 0;
-        let answers = [];
-        let startTime = 0;
-        let timerInterval;
+        // TP5: Static & Dynamic Routing, ACLs, NAT/PAT
+        tp5: [
+          {
+            q: "Pour configurer une route statique?",
+            o: [
+              "ip route [réseau] [masque] [next-hop]",
+              "route add [réseau] [masque] [next-hop]",
+              "static route [réseau] [next-hop]",
+              "add route [réseau]",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Quelle commande configure une route par défaut?",
+            o: [
+              "ip route 0.0.0.0 0.0.0.0 [next-hop]",
+              "default route [next-hop]",
+              "ip default-route [next-hop]",
+              "route default [next-hop]",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Pour activer RIP?",
+            o: ["router rip", "enable rip", "rip enable", "activate rip"],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Quelle commande spécifie un réseau dans RIP?",
+            o: [
+              "network [réseau]",
+              "rip network [réseau]",
+              "advertise [réseau]",
+              "add network [réseau]",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Pour activer RIP version 2?",
+            o: ["version 2", "rip version 2", "set version 2", "v2"],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Quelle commande désactive l'auto-summary?",
+            o: [
+              "no auto-summary",
+              "auto-summary off",
+              "disable auto-summary",
+              "no summary",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Pour créer une ACL standard?",
+            o: [
+              "access-list [numéro] permit/deny [IP]",
+              "acl [numéro] permit [IP]",
+              "create acl [numéro]",
+              "ip access-list [numéro]",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Quelle commande applique une ACL sur une interface?",
+            o: [
+              "ip access-group [numéro] in/out",
+              "apply acl [numéro]",
+              "acl [numéro] in",
+              "access-list apply [numéro]",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Pour afficher les ACLs?",
+            o: [
+              "show access-lists",
+              "show acl",
+              "display acl",
+              "get access-lists",
+            ],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Quelle commande configure NAT statique?",
+            o: [
+              "ip nat inside source static [IP-locale] [IP-globale]",
+              "nat static [IP-locale] [IP-globale]",
+              "static nat [IP-locale] [IP-globale]",
+              "ip nat static [IP-locale] [IP-globale]",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Pour configurer NAT dynamique avec pool?",
+            o: [
+              "ip nat pool [nom] [début] [fin] netmask [masque]",
+              "nat pool [nom] [début] [fin]",
+              "create nat pool [nom]",
+              "pool nat [nom]",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Quelle commande configure PAT (overload)?",
+            o: [
+              "ip nat inside source list [ACL] interface [int] overload",
+              "nat overload [int]",
+              "pat [int]",
+              "ip nat overload",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Pour désigner une interface inside NAT?",
+            o: ["ip nat inside", "nat inside", "inside nat", "nat-inside"],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Pour désigner une interface outside NAT?",
+            o: ["ip nat outside", "nat outside", "outside nat", "nat-outside"],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Quelle commande affiche les traductions NAT?",
+            o: [
+              "show ip nat translations",
+              "show nat",
+              "display nat",
+              "get nat translations",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Pour effacer les traductions NAT?",
+            o: [
+              "clear ip nat translation *",
+              "clear nat",
+              "delete nat",
+              "remove nat translations",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Quelle commande crée une ACL étendue nommée?",
+            o: [
+              "ip access-list extended [nom]",
+              "access-list extended [nom]",
+              "create acl extended [nom]",
+              "acl extended [nom]",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Pour supprimer une route statique?",
+            o: [
+              "no ip route [réseau] [masque] [next-hop]",
+              "delete route [réseau]",
+              "remove route [réseau]",
+              "clear route [réseau]",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Quelle commande affiche les routes RIP?",
+            o: ["show ip rip", "show ip protocols", "show rip", "display rip"],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Pour déboguer RIP?",
+            o: ["debug ip rip", "debug rip", "trace rip", "monitor rip"],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Quelle commande désactive le débogage?",
+            o: ["undebug all", "no debug", "debug off", "stop debug"],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Vérifier type d'interfaces (DCE/DTE):",
+            o: [
+              "show controllers serial [interface]",
+              "show interface type",
+              "display interface",
+              "get interface info",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Configurer clock rate pour DCE:",
+            o: [
+              "interface serial0/1/0, puis clock rate 64000",
+              "set clock 64000",
+              "clock 64000",
+              "rate 64000",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Afficher résumé des interfaces routeur:",
+            o: [
+              "show ip interface brief",
+              "show interfaces summary",
+              "display interfaces",
+              "list interfaces",
+            ],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Annuler routage statique et activer RIP:",
+            o: [
+              "no ip route [réseau] [masque] [next-hop], puis router rip, version 2, network [réseaux], no auto-summary",
+              "delete route, enable rip",
+              "remove static, rip enable",
+              "clear routes, start rip",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Configurer accès Telnet au routeur:",
+            o: [
+              "line vty 0 4, password [mot], login",
+              "telnet password [mot]",
+              "vty password [mot]",
+              "set telnet password",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Créer ACL standard refusant trafic PC0:",
+            o: [
+              "access-list 1 deny host [IP_PC0], puis access-list 1 permit any",
+              "acl deny [IP_PC0]",
+              "block [IP_PC0]",
+              "deny traffic [IP_PC0]",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Créer ACL refusant telnet du PC8 vers R1:",
+            o: [
+              "access-list 1 deny [IP_PC8] 0.0.0.0, puis access-list 1 permit any, puis appliquer sur interface",
+              "deny telnet [IP_PC8]",
+              "block telnet from PC8",
+              "acl telnet deny",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "NAT statique pour IP locale vers IP globale:",
+            o: [
+              "ip nat inside source static [IP_locale] [IP_globale]",
+              "nat static [IP_locale] [IP_globale]",
+              "static nat [IPs]",
+              "configure nat static",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "NAT dynamique avec pool nommé:",
+            o: [
+              "ip nat pool [nom] [début] [fin] netmask [masque], puis ip nat inside source list [ACL] pool [nom]",
+              "nat pool [nom] [range]",
+              "dynamic nat pool",
+              "create nat pool",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "PAT (overload) avec ACL et interface:",
+            o: [
+              "ip nat inside source list [ACL] interface [interface] overload",
+              "nat overload",
+              "pat enable",
+              "overload nat",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Vérifier résultat NAT avec débogage:",
+            o: [
+              "do debug ip nat (en mode config) ou debug ip nat (en mode privileged)",
+              "show nat debug",
+              "display nat",
+              "trace nat",
+            ],
+            c: 0,
+            d: "hard",
+          },
+        ],
 
-        function startQuiz(type) {
-            currentQuiz = [...quizData[type]];
-            shuffleArray(currentQuiz);
-            currentQuestion = 0;
-            score = 0;
-            answers = new Array(currentQuiz.length).fill(null);
-            
-            document.getElementById('quizSelector').style.display = 'none';
-            document.getElementById('questionContainer').style.display = 'block';
-            
-            startTime = Date.now();
-            timerInterval = setInterval(updateTimer, 1000);
-            
-            showQuestion();
+        // TP6: VLSM
+        vlsm: [
+          {
+            q: "VLSM signifie?",
+            o: [
+              "Variable Length Subnet Mask",
+              "Very Large Subnet Mask",
+              "Virtual LAN Subnet Mask",
+              "Variable Link Subnet Method",
+            ],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Quel avantage principal de VLSM?",
+            o: [
+              "Optimiser l'utilisation des adresses IP",
+              "Augmenter la vitesse",
+              "Réduire les collisions",
+              "Simplifier le routage",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Pour 50 hôtes, quel masque minimum?",
+            o: ["/25", "/26", "/27", "/28"],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Pour 25 hôtes, quel masque minimum?",
+            o: ["/26", "/27", "/28", "/29"],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Pour 12 hôtes, quel masque minimum?",
+            o: ["/27", "/28", "/29", "/30"],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Pour 5 hôtes, quel masque minimum?",
+            o: ["/28", "/29", "/30", "/31"],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Pour une liaison point-à-point, quel masque?",
+            o: ["/30", "/31", "/32", "/29"],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Un /26 permet combien d'hôtes?",
+            o: ["62", "64", "126", "128"],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Un /27 permet combien d'hôtes?",
+            o: ["30", "32", "14", "16"],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Un /28 permet combien d'hôtes?",
+            o: ["14", "16", "30", "32"],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Un /29 permet combien d'hôtes?",
+            o: ["6", "8", "14", "16"],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Un /30 permet combien d'hôtes?",
+            o: ["2", "4", "6", "8"],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Quel protocole supporte VLSM?",
+            o: ["RIPv1", "RIPv2", "IGRP", "Aucun"],
+            c: 1,
+            d: "medium",
+          },
+          {
+            q: "Le masque 255.255.255.252 correspond à?",
+            o: ["/30", "/29", "/28", "/31"],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Le masque 255.255.255.240 correspond à?",
+            o: ["/28", "/27", "/26", "/29"],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Le masque 255.255.255.224 correspond à?",
+            o: ["/27", "/28", "/26", "/25"],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Le masque 255.255.255.192 correspond à?",
+            o: ["/26", "/27", "/25", "/28"],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Pour subdiviser 192.168.1.0/24 en 4 sous-réseaux égaux?",
+            o: ["/26", "/25", "/27", "/28"],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Combien de sous-réseaux avec un /26 depuis /24?",
+            o: ["4", "2", "8", "16"],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "VLSM permet d'utiliser différents masques sur?",
+            o: [
+              "Différents sous-réseaux",
+              "Même sous-réseau",
+              "Même interface",
+              "Même routeur uniquement",
+            ],
+            c: 0,
+            d: "medium",
+          },
+        ],
+
+        // Mode EASY - Questions faciles tous TPs
+        easy: [
+          {
+            q: "Quelle commande teste la connectivité?",
+            o: ["ping", "test", "connect", "check"],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Commande pour passer en mode privilégié?",
+            o: ["enable", "privileged", "admin", "super"],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Commande pour entrer en configuration globale?",
+            o: ["configure terminal", "config", "global", "setup"],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Pour changer le nom d'un switch?",
+            o: [
+              "hostname [nom]",
+              "name [nom]",
+              "switchname [nom]",
+              "setname [nom]",
+            ],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Commande pour sauvegarder la config?",
+            o: [
+              "copy running-config startup-config",
+              "save",
+              "write",
+              "backup",
+            ],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Pour activer une interface?",
+            o: ["no shutdown", "enable", "up", "activate"],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Afficher la config courante?",
+            o: [
+              "show running-config",
+              "show config",
+              "display config",
+              "get config",
+            ],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Pour créer VLAN 10?",
+            o: ["vlan 10", "create vlan 10", "add vlan 10", "new vlan 10"],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Afficher les VLANs?",
+            o: ["show vlan brief", "show vlan", "display vlan", "list vlan"],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Configurer port en mode access?",
+            o: [
+              "switchport mode access",
+              "access mode",
+              "port access",
+              "mode access",
+            ],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Afficher la table de routage?",
+            o: ["show ip route", "show route", "display route", "get route"],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Commande pour voir les interfaces?",
+            o: [
+              "show ip interface brief",
+              "show interfaces",
+              "display int",
+              "list int",
+            ],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Pour configurer une IP sur interface?",
+            o: [
+              "ip address [IP] [masque]",
+              "set ip [IP]",
+              "interface ip [IP]",
+              "ip [IP]",
+            ],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Tester la pile TCP/IP locale?",
+            o: ["ping 127.0.0.1", "ping localhost", "test tcp", "check ip"],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Afficher config IP d'un PC Windows?",
+            o: ["ipconfig", "ifconfig", "showip", "getip"],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Pour voir la version IOS?",
+            o: ["show version", "show ios", "version", "get version"],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Définir mot de passe enable crypté?",
+            o: [
+              "enable secret [mot]",
+              "enable password [mot]",
+              "password enable [mot]",
+              "secret [mot]",
+            ],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Mode pour configurer une interface?",
+            o: [
+              "interface [nom]",
+              "config interface [nom]",
+              "int [nom]",
+              "if [nom]",
+            ],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Afficher la table MAC?",
+            o: [
+              "show mac-address-table",
+              "show mac",
+              "display mac",
+              "list mac",
+            ],
+            c: 0,
+            d: "easy",
+          },
+          {
+            q: "Pour nommer un VLAN?",
+            o: [
+              "name [nom]",
+              "vlan name [nom]",
+              "setname [nom]",
+              "title [nom]",
+            ],
+            c: 0,
+            d: "easy",
+          },
+        ],
+
+        // Mode MEDIUM - Questions moyennes
+        medium: [
+          {
+            q: "Configurer passerelle par défaut sur switch?",
+            o: [
+              "ip default-gateway [IP]",
+              "default-gateway [IP]",
+              "gateway [IP]",
+              "ip gateway [IP]",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Assigner port au VLAN 20 en access?",
+            o: [
+              "switchport access vlan 20",
+              "vlan 20",
+              "access vlan 20",
+              "port vlan 20",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Configurer un port en trunk?",
+            o: [
+              "switchport mode trunk",
+              "trunk mode",
+              "mode trunk",
+              "port trunk",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Activer la sécurité sur un port?",
+            o: [
+              "switchport port-security",
+              "port-security",
+              "security enable",
+              "enable security",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Limiter à 3 adresses MAC sur port?",
+            o: [
+              "switchport port-security maximum 3",
+              "port-security max 3",
+              "maximum mac 3",
+              "limit 3",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Configurer ligne console avec password?",
+            o: [
+              "line console 0, password [mot], login",
+              "console password [mot]",
+              "line con 0, pass [mot]",
+              "console [mot]",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Configurer lignes VTY 0-4 pour Telnet?",
+            o: [
+              "line vty 0 4, password [mot], login",
+              "vty password [mot]",
+              "telnet password [mot]",
+              "line vty [mot]",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Afficher les interfaces en trunk?",
+            o: [
+              "show interfaces trunk",
+              "show trunk",
+              "display trunk",
+              "list trunk",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Créer route statique?",
+            o: [
+              "ip route [net] [mask] [next-hop]",
+              "route [net] [next-hop]",
+              "static route [net]",
+              "add route [net]",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Configurer route par défaut?",
+            o: [
+              "ip route 0.0.0.0 0.0.0.0 [next-hop]",
+              "default route [next-hop]",
+              "ip default [next-hop]",
+              "route default",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Activer RIP sur routeur?",
+            o: ["router rip", "enable rip", "rip on", "activate rip"],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Déclarer réseau dans RIP?",
+            o: [
+              "network [réseau]",
+              "rip network [réseau]",
+              "advertise [réseau]",
+              "add [réseau]",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Activer RIP version 2?",
+            o: ["version 2", "rip v2", "v2", "rip version 2"],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Désactiver auto-summary RIP?",
+            o: [
+              "no auto-summary",
+              "auto-summary off",
+              "disable summary",
+              "no summary",
+            ],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Afficher table ARP?",
+            o: ["show arp", "show ip arp", "display arp", "arp -a"],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Vider cache DNS Windows?",
+            o: ["ipconfig /flushdns", "dns flush", "clear dns", "flush dns"],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Afficher table routage Windows?",
+            o: ["route print", "show route", "netstat -r", "display route"],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Tracer route sous Windows?",
+            o: ["tracert [IP]", "traceroute [IP]", "trace [IP]", "path [IP]"],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Afficher connexions actives?",
+            o: ["netstat", "show connections", "connections", "active"],
+            c: 0,
+            d: "medium",
+          },
+          {
+            q: "Configurer clock rate DCE?",
+            o: [
+              "clock rate 64000",
+              "clock 64000",
+              "rate 64000",
+              "set clock 64000",
+            ],
+            c: 0,
+            d: "medium",
+          },
+        ],
+
+        // Mode HARD - Questions difficiles
+        hard: [
+          {
+            q: "Sticky MAC learning activation?",
+            o: [
+              "switchport port-security mac-address sticky",
+              "mac-address sticky",
+              "sticky mac",
+              "port-security sticky",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Action violation shutdown port-security?",
+            o: [
+              "switchport port-security violation shutdown",
+              "violation shutdown",
+              "security shutdown",
+              "port violation shutdown",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Configurer VLAN natif 99 sur trunk?",
+            o: [
+              "switchport trunk native vlan 99",
+              "native vlan 99",
+              "trunk native 99",
+              "vlan native 99",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Désactiver DTP sur port?",
+            o: ["switchport nonegotiate", "no dtp", "dtp off", "nonegotiate"],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "ACL standard pour autoriser 192.168.1.0/24?",
+            o: [
+              "access-list 1 permit 192.168.1.0 0.0.0.255",
+              "acl 1 permit 192.168.1.0",
+              "access-list permit 192.168.1.0",
+              "acl permit 192.168.1.0/24",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Appliquer ACL 10 en entrée sur fa0/0?",
+            o: [
+              "ip access-group 10 in",
+              "access-group 10 in",
+              "apply acl 10 in",
+              "acl 10 in",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "NAT statique pour 192.168.1.10 vers 200.1.1.10?",
+            o: [
+              "ip nat inside source static 192.168.1.10 200.1.1.10",
+              "nat static 192.168.1.10 200.1.1.10",
+              "ip nat static 192.168.1.10 200.1.1.10",
+              "static nat 192.168.1.10 200.1.1.10",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Pool NAT nommé PUBLIC 200.1.1.1-200.1.1.10?",
+            o: [
+              "ip nat pool PUBLIC 200.1.1.1 200.1.1.10 netmask 255.255.255.0",
+              "nat pool PUBLIC 200.1.1.1 200.1.1.10",
+              "ip nat pool PUBLIC 200.1.1.1-10",
+              "pool PUBLIC 200.1.1.1 200.1.1.10",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "PAT avec ACL 1 sur interface fa0/1?",
+            o: [
+              "ip nat inside source list 1 interface fa0/1 overload",
+              "nat overload fa0/1 list 1",
+              "ip nat overload 1 fa0/1",
+              "pat 1 fa0/1",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "ACL étendue nommée BLOQUE_WEB?",
+            o: [
+              "ip access-list extended BLOQUE_WEB",
+              "access-list extended BLOQUE_WEB",
+              "acl extended BLOQUE_WEB",
+              "create acl BLOQUE_WEB",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Dans ACL étendue, bloquer HTTP de 192.168.1.0/24?",
+            o: [
+              "deny tcp 192.168.1.0 0.0.0.255 any eq 80",
+              "deny http 192.168.1.0 0.0.0.255",
+              "block tcp 192.168.1.0 80",
+              "deny 192.168.1.0 port 80",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Afficher traductions NAT actives?",
+            o: [
+              "show ip nat translations",
+              "show nat translations",
+              "display nat",
+              "show nat active",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Effacer toutes traductions NAT?",
+            o: [
+              "clear ip nat translation *",
+              "clear nat all",
+              "delete nat translations",
+              "flush nat",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Déboguer RIP en temps réel?",
+            o: ["debug ip rip", "debug rip", "trace rip", "monitor rip"],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Arrêter tous les déboguages?",
+            o: ["undebug all", "no debug all", "stop debug", "debug off"],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Metric RIP basée sur quoi?",
+            o: ["Nombre de sauts", "Bande passante", "Délai", "Coût"],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Désactiver recherche DNS sur routeur?",
+            o: [
+              "no ip domain-lookup",
+              "dns off",
+              "no dns lookup",
+              "disable dns",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Configurer bannière MOTD?",
+            o: [
+              "banner motd # [texte] #",
+              "banner [texte]",
+              "motd [texte]",
+              "message [texte]",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Encrypter tous les mots de passe?",
+            o: [
+              "service password-encryption",
+              "encrypt passwords",
+              "password encryption",
+              "secure passwords",
+            ],
+            c: 0,
+            d: "hard",
+          },
+          {
+            q: "Définir timeout console 5 min?",
+            o: [
+              "exec-timeout 5 0",
+              "timeout 5",
+              "console timeout 5",
+              "timeout 300",
+            ],
+            c: 0,
+            d: "hard",
+          },
+        ],
+
+        // ALL - Combine tous les quiz
+        all: [],
+      };
+
+      // Combine all quizzes for 'all' mode
+      quizData.all = [
+        ...quizData.tp1,
+        ...quizData.tp2,
+        ...quizData.tp3,
+        ...quizData.tp4,
+        ...quizData.tp5,
+        ...quizData.vlsm,
+      ];
+
+      let currentQuiz = [];
+      let currentQuestion = 0;
+      let score = 0;
+      let answers = [];
+      let startTime = 0;
+      let timerInterval;
+
+      function startQuiz(type) {
+        currentQuiz = [...quizData[type]];
+        shuffleArray(currentQuiz);
+        currentQuestion = 0;
+        score = 0;
+        answers = new Array(currentQuiz.length).fill(null);
+
+        document.getElementById("quizSelector").style.display = "none";
+        document.getElementById("questionContainer").style.display = "block";
+
+        startTime = Date.now();
+        timerInterval = setInterval(updateTimer, 1000);
+
+        showQuestion();
+      }
+
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+      }
+
+      function showQuestion() {
+        const q = currentQuiz[currentQuestion];
+
+        document.getElementById("questionNumber").textContent = `Question ${
+          currentQuestion + 1
+        }/${currentQuiz.length}`;
+
+        document.getElementById("questionText").innerHTML = q.q;
+
+        const progress = ((currentQuestion + 1) / currentQuiz.length) * 100;
+        document.getElementById("progressFill").style.width = progress + "%";
+
+        const container = document.getElementById("optionsContainer");
+        container.innerHTML = "";
+
+        q.o.forEach((option, index) => {
+          const div = document.createElement("div");
+          div.className = "option";
+          if (answers[currentQuestion] === index) {
+            div.classList.add("selected");
+          }
+
+          const letter = String.fromCharCode(65 + index);
+          div.innerHTML = `<span class="option-letter">${letter}</span><span>${option}</span>`;
+
+          div.onclick = () => selectOption(index);
+          container.appendChild(div);
+        });
+
+        updateNavigationButtons();
+      }
+
+      function selectOption(index) {
+        answers[currentQuestion] = index;
+
+        const options = document.querySelectorAll(".option");
+        options.forEach((opt, i) => {
+          opt.classList.remove("selected");
+          if (i === index) {
+            opt.classList.add("selected");
+          }
+        });
+
+        document.getElementById("nextBtn").disabled = false;
+      }
+
+      function nextQuestion() {
+        if (currentQuestion < currentQuiz.length - 1) {
+          currentQuestion++;
+          showQuestion();
+        } else {
+          finishQuiz();
+        }
+      }
+
+      function previousQuestion() {
+        if (currentQuestion > 0) {
+          currentQuestion--;
+          showQuestion();
+        }
+      }
+
+      function updateNavigationButtons() {
+        document.getElementById("nextBtn").disabled =
+          answers[currentQuestion] === null;
+
+        if (currentQuestion === currentQuiz.length - 1) {
+          document.getElementById("nextBtn").textContent = "Terminer";
+        } else {
+          document.getElementById("nextBtn").textContent = "Suivant →";
+        }
+      }
+
+      function updateTimer() {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        document.getElementById("timer").textContent = `⏱️ ${minutes}:${seconds
+          .toString()
+          .padStart(2, "0")}`;
+
+        const totalTime = Math.floor((Date.now() - startTime) / 1000);
+        const mins = Math.floor(totalTime / 60);
+        const secs = totalTime % 60;
+        document.getElementById("quizTime").textContent = `${mins}:${secs
+          .toString()
+          .padStart(2, "0")}`;
+      }
+
+      function finishQuiz() {
+        clearInterval(timerInterval);
+
+        score = 0;
+        answers.forEach((answer, index) => {
+          if (answer === currentQuiz[index].c) {
+            score++;
+          }
+        });
+
+        const percentage = Math.round((score / currentQuiz.length) * 100);
+
+        document.getElementById("questionContainer").style.display = "none";
+        document.getElementById("results").style.display = "block";
+
+        const scoreCircle = document.getElementById("scoreCircle");
+        scoreCircle.textContent = percentage + "%";
+
+        if (percentage >= 80) {
+          scoreCircle.className = "score-circle excellent";
+          document.getElementById(
+            "feedback"
+          ).innerHTML = `<strong>Excellent!</strong><br>Vous maîtrisez parfaitement les commandes CLI!<br>Score: ${score}/${currentQuiz.length}`;
+        } else if (percentage >= 60) {
+          scoreCircle.className = "score-circle good";
+          document.getElementById(
+            "feedback"
+          ).innerHTML = `<strong>Bien!</strong><br>Continuez à pratiquer pour améliorer.<br>Score: ${score}/${currentQuiz.length}`;
+        } else {
+          scoreCircle.className = "score-circle needs-improvement";
+          document.getElementById(
+            "feedback"
+          ).innerHTML = `<strong>À améliorer</strong><br>Révisez les commandes et réessayez.<br>Score: ${score}/${currentQuiz.length}`;
         }
 
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
+        document.getElementById("userScore").textContent = percentage + "%";
+      }
 
-        function showQuestion() {
-            const q = currentQuiz[currentQuestion];
-            
-            document.getElementById('questionNumber').textContent = 
-                `Question ${currentQuestion + 1}/${currentQuiz.length}`;
-            
-            document.getElementById('questionText').innerHTML = q.q;
-            
-            const progress = ((currentQuestion + 1) / currentQuiz.length) * 100;
-            document.getElementById('progressFill').style.width = progress + '%';
-            
-            const container = document.getElementById('optionsContainer');
-            container.innerHTML = '';
-            
-            q.o.forEach((option, index) => {
-                const div = document.createElement('div');
-                div.className = 'option';
-                if (answers[currentQuestion] === index) {
-                    div.classList.add('selected');
-                }
-                
-                const letter = String.fromCharCode(65 + index);
-                div.innerHTML = `<span class="option-letter">${letter}</span><span>${option}</span>`;
-                
-                div.onclick = () => selectOption(index);
-                container.appendChild(div);
-            });
-            
-            updateNavigationButtons();
-        }
+      function restartQuiz() {
+        currentQuestion = 0;
+        score = 0;
+        answers = new Array(currentQuiz.length).fill(null);
+        shuffleArray(currentQuiz);
 
-        function selectOption(index) {
-            answers[currentQuestion] = index;
-            
-            const options = document.querySelectorAll('.option');
-            options.forEach((opt, i) => {
-                opt.classList.remove('selected');
-                if (i === index) {
-                    opt.classList.add('selected');
-                }
-            });
-            
-            document.getElementById('nextBtn').disabled = false;
-        }
+        document.getElementById("results").style.display = "none";
+        document.getElementById("questionContainer").style.display = "block";
 
-        function nextQuestion() {
-            if (currentQuestion < currentQuiz.length - 1) {
-                currentQuestion++;
-                showQuestion();
-            } else {
-                finishQuiz();
-            }
-        }
+        startTime = Date.now();
+        timerInterval = setInterval(updateTimer, 1000);
 
-        function previousQuestion() {
-            if (currentQuestion > 0) {
-                currentQuestion--;
-                showQuestion();
-            }
-        }
+        showQuestion();
+      }
 
-        function updateNavigationButtons() {
-            document.getElementById('nextBtn').disabled = answers[currentQuestion] === null;
-            
-            if (currentQuestion === currentQuiz.length - 1) {
-                document.getElementById('nextBtn').textContent = 'Terminer';
-            } else {
-                document.getElementById('nextBtn').textContent = 'Suivant →';
-            }
-        }
-
-        function updateTimer() {
-            const elapsed = Math.floor((Date.now() - startTime) / 1000);
-            const minutes = Math.floor(elapsed / 60);
-            const seconds = elapsed % 60;
-            document.getElementById('timer').textContent = 
-                `⏱️ ${minutes}:${seconds.toString().padStart(2, '0')}`;
-            
-            const totalTime = Math.floor((Date.now() - startTime) / 1000);
-            const mins = Math.floor(totalTime / 60);
-            const secs = totalTime % 60;
-            document.getElementById('quizTime').textContent = 
-                `${mins}:${secs.toString().padStart(2, '0')}`;
-        }
-
-        function finishQuiz() {
-            clearInterval(timerInterval);
-            
-            score = 0;
-            answers.forEach((answer, index) => {
-                if (answer === currentQuiz[index].c) {
-                    score++;
-                }
-            });
-            
-            const percentage = Math.round((score / currentQuiz.length) * 100);
-            
-            document.getElementById('questionContainer').style.display = 'none';
-            document.getElementById('results').style.display = 'block';
-            
-            const scoreCircle = document.getElementById('scoreCircle');
-            scoreCircle.textContent = percentage + '%';
-            
-            if (percentage >= 80) {
-                scoreCircle.className = 'score-circle excellent';
-                document.getElementById('feedback').innerHTML = 
-                    `<strong>Excellent!</strong><br>Vous maîtrisez parfaitement les commandes CLI!<br>Score: ${score}/${currentQuiz.length}`;
-            } else if (percentage >= 60) {
-                scoreCircle.className = 'score-circle good';
-                document.getElementById('feedback').innerHTML = 
-                    `<strong>Bien!</strong><br>Continuez à pratiquer pour améliorer.<br>Score: ${score}/${currentQuiz.length}`;
-            } else {
-                scoreCircle.className = 'score-circle needs-improvement';
-                document.getElementById('feedback').innerHTML = 
-                    `<strong>À améliorer</strong><br>Révisez les commandes et réessayez.<br>Score: ${score}/${currentQuiz.length}`;
-            }
-            
-            document.getElementById('userScore').textContent = percentage + '%';
-        }
-
-        function restartQuiz() {
-            currentQuestion = 0;
-            score = 0;
-            answers = new Array(currentQuiz.length).fill(null);
-            shuffleArray(currentQuiz);
-            
-            document.getElementById('results').style.display = 'none';
-            document.getElementById('questionContainer').style.display = 'block';
-            
-            startTime = Date.now();
-            timerInterval = setInterval(updateTimer, 1000);
-            
-            showQuestion();
-        }
-
-        function backToMenu() {
-            clearInterval(timerInterval);
-            document.getElementById('results').style.display = 'none';
-            document.getElementById('quizSelector').style.display = 'grid';
-            document.getElementById('quizTime').textContent = '0:00';
-        }
+      function backToMenu() {
+        clearInterval(timerInterval);
+        document.getElementById("results").style.display = "none";
+        document.getElementById("questionContainer").style.display = "none";
+        document.getElementById("quizSelector").style.display = "grid";
+        document.getElementById("quizTime").textContent = "0:00";
+        document.getElementById("timer").textContent = "⏱️ 0:00";
+      }
     </script>
-</body>
+  </body>
 </html>
